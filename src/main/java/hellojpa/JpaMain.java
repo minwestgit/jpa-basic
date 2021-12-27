@@ -15,18 +15,11 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 엔티티 등록
-            Member member1 = new Member(150L, "A");
-            Member member2 = new Member(160L, "B");
+            Member member = new Member(200L, "member200");
+            em.persist(member);
 
-            em.persist(member1);
-            em.persist(member2);
-
-            // 엔티티 수정
-            Member findMember = em.find(Member.class, 101L);
-            member.setName("ZZZ");
-
-            tx.commit(); // 커밋하는 순간에 쿼리 실행
+            em.flush(); // 쿼리 즉시 실행
+            tx.commit();
         } catch(Exception e) {
             tx.rollback();
         } finally {
