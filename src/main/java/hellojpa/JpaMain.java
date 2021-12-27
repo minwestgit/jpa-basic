@@ -15,22 +15,18 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setId(101L);
+            // 엔티티 등록
+            Member member1 = new Member(150L, "A");
+            Member member2 = new Member(160L, "B");
 
-            em.getTransaction().begin();
+            em.persist(member1);
+            em.persist(member2);
 
-            // 객체를 저장한 상태(영속) -> 1차 캐시에 저장
-            em.persist(member);
-
-            // 1차 캐시에서 조회(없으면 DB에서 조회)
+            // 엔티티 수정
             Member findMember = em.find(Member.class, 101L);
+            member.setName("ZZZ");
 
-            // 영속 엔티티의 동일성 보장
-            Member findMember1 = em.find(Member.class, 101L);
-            Member findMember2 = em.find(Member.class, 101L);
-
-            System.out.println("result = " + (findMember1 == findMember2));
+            tx.commit(); // 커밋하는 순간에 쿼리 실행
         } catch(Exception e) {
             tx.rollback();
         } finally {
