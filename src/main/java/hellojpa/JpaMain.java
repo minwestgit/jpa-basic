@@ -15,16 +15,22 @@ public class JpaMain {
         tx.begin();
 
         try {
-            /*
             Member member = new Member();
-            member.setId(1L);
-            member.setName("HelloA");
+            member.setId(101L);
+
+            em.getTransaction().begin();
+
+            // 객체를 저장한 상태(영속) -> 1차 캐시에 저장
             em.persist(member);
-             */
-            Member fineMember = em.find(Member.class, 1L);
-            System.out.println("Id" + fineMember.getId());
-            System.out.println("Name" + fineMember.getName());
-            tx.commit();
+
+            // 1차 캐시에서 조회(없으면 DB에서 조회)
+            Member findMember = em.find(Member.class, 101L);
+
+            // 영속 엔티티의 동일성 보장
+            Member findMember1 = em.find(Member.class, 101L);
+            Member findMember2 = em.find(Member.class, 101L);
+
+            System.out.println("result = " + (findMember1 == findMember2));
         } catch(Exception e) {
             tx.rollback();
         } finally {
