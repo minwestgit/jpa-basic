@@ -15,11 +15,11 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member(200L, "member200");
-            em.persist(member);
+            Member member = em.find(Member.class, 150L);
+            member.setName("AAAA");
 
-            em.flush(); // 쿼리 즉시 실행
-            tx.commit();
+            em.detach(member); // 영속성 컨텍스트에서 분리
+            tx.commit(); // update 쿼리가 실행되지 않음!!
         } catch(Exception e) {
             tx.rollback();
         } finally {
