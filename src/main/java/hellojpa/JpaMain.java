@@ -16,7 +16,7 @@ public class JpaMain {
 
         try {
             Member member = em.find(Member.class, 150L);
-            member.setName("AAAA");
+            member.setUsername("AAAA");
 
             em.detach(member); // 영속성 컨텍스트에서 분리
             tx.commit(); // update 쿼리가 실행되지 않음!!
