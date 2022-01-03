@@ -48,12 +48,4 @@ public class Item {
     public void setStackQuantity(int stackQuantity) {
         this.stackQuantity = stackQuantity;
     }
-
-    @Entity
-    public static class Team {
-        @Id @GeneratedValue
-        @Column(name = "TEAM_ID")
-        private Long id;
-        private String name;
-    }
 }
