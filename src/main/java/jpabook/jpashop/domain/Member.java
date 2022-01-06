@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -15,6 +17,9 @@ public class Member {
     @ManyToOne // Member가 Many, Team이 One
     @JoinColumn(name = "TEAM_ID")
     private Team team;
+
+    @OneToMany(mappedBy = "member") // Order의 member가 주인
+    private List<Order> orders = new ArrayList<>();
 
     public Long getId() {
         return id;

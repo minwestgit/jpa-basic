@@ -1,12 +1,15 @@
 package jpabook.jpashop;
 
 import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -17,22 +20,15 @@ public class JpaMain {
         tx.begin();
 
         try {
-            //저장
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
-
             Member member = new Member();
             member.setName("member1");
-            // member.setTeamId(team.getId());
-            member.setTeam(team);
+
             em.persist(member);
 
-            Member findMember = em.find(Member.class, member.getId());
-            // 연관관계 설정을 안해주면 객체지향스럽지 않음.
-            //Long findTeamId = findMember.getTeadId();
-            //Team findTeam = em.find(Team.class, findTeamId);
-            Team findTeam = findMember.getTeam();
+            Team team = new Team();
+            team.setName("teamA");
+            team.getMembers().add(member); // Member 테이블의 FK가 업데이트 되어야함.
+            // Team 테이블에 데이터 추가 후 어쩔수 없이 Member 테이블도 Update 해줘야해서 어쩔수없이 쿼리가 한번 더 실행됨.
 
             tx.commit();
         } catch(Exception e) {
