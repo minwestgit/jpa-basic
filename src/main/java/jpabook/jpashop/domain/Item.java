@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Item {
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
+public abstract class Item {
 
     @Id
     @GeneratedValue
-    @Column(name = "ITEM_ID")
     private long id;
 
     private String name;
     private int price;
-    private int stackQuantity;
 
     @ManyToMany(mappedBy="items")
     private List<Category> categories = new ArrayList<>();
@@ -41,13 +41,5 @@ public class Item {
 
     public void setPrice(int price) {
         this.price = price;
-    }
-
-    public int getStackQuantity() {
-        return stackQuantity;
-    }
-
-    public void setStackQuantity(int stackQuantity) {
-        this.stackQuantity = stackQuantity;
     }
 }

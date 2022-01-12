@@ -1,9 +1,6 @@
 package jpabook.jpashop;
 
-import jpabook.jpashop.domain.Member;
-import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.domain.OrderItem;
-import jpabook.jpashop.domain.Team;
+import jpabook.jpashop.domain.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,15 +17,17 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setName("member1");
+            Movie movie = new Movie();
+            movie.setDirector("aaaa");
+            movie.setActor("bbbb");
+            movie.setName("cccc");
+            movie.setPrice(10000);
+            em.persist(movie);
 
-            em.persist(member);
+            em.flush();
+            em.clear();
 
-            Team team = new Team();
-            team.setName("teamA");
-            team.getMembers().add(member); // Member 테이블의 FK가 업데이트 되어야함.
-            // Team 테이블에 데이터 추가 후 어쩔수 없이 Member 테이블도 Update 해줘야해서 어쩔수없이 쿼리가 한번 더 실행됨.
+            em.find(Movie.class, movie.getId());
 
             tx.commit();
         } catch(Exception e) {
