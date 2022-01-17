@@ -18,42 +18,32 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setName("hello");
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
 
-            em.persist(member);
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
+
+            Member member1 = new Member();
+            member1.setName("member1");
+            member1.setTeam(team);
+            em.persist(member1);
+
+            Member member2 = new Member();
+            member2.setName("member2");
+            member2.setTeam(teamB);
+            em.persist(member2);
 
             em.flush();
             em.clear();
 
-            //프록시
-            //Member findMember = em.find(Member.class, member.getId());
-            //System.out.println("findMember.id = " + findMember.getId());
-            //System.out.println("findMember.userName = " + findMember.getName());
+            List<Member> members = em.createQuery("select m from Member m", Member.class)
+                    .getResultList(); // Team 즉시 로딩시 N+1 문제 발생
 
-            Member member1 = new Member();
-            member1.setName("member1");
-            em.persist(member1);
-            Member member2 = new Member();
-            member2.setName("member2");
-            em.persist(member2);
-
-            Member m1 = em.find(Member.class, member1.getId());
-            Member m2 = em.find(Member.class, member2.getId());
-
-            System.out.println("m1 == m2: " + (m1.getClass() == m2.getClass())); // false
-            System.out.println("m1 instanceof: " + (m1 instanceof Member)); // true
-
-            Member reference = em.getReference(Member.class, member1.getId());
-            System.out.println("reference: " + reference.getClass()); // 이거도 Member 반환
-
-            Member refMember = em.getReference(Member.class, member1.getId()); // 프록시 초기화
-            // 프록시 초기화 후 find 호출 시 같은 객체 반환
-            Member findMember = em.find(Member.class, member1.getId());
-
-            em.detach(refMember);
-            refMember.getName();
-
+            //Member m = em.find(Member.class, member1.getId());
+            //m.getTeam().getName(); // 이 시점에 프록시 조회(지연로딩LAZY)
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
