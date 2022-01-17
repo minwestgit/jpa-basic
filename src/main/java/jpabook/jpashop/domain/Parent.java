@@ -16,7 +16,7 @@ public class Parent {
 
     private String name;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy="parent", orphanRemoval = true)
     private List<Child> childList = new ArrayList<>();
 
     public void addChild(Child child) {
