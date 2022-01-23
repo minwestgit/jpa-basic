@@ -13,7 +13,7 @@ public class Category {
     private String name;
 
     // 셀프 매핑(부모-자식 관계)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "PARENT_ID")
     private Category parent;
 
