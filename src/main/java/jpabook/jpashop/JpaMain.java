@@ -19,19 +19,12 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 엔티티 프로젝션
-            List<Member> result = em.createQuery("select m from Member m", Member.class)
+            //페이징 쿼리
+            String jpql = "select m from Member m order by m.name desc";
+            List<Member> resultList = em.createQuery(jpql, Member.class)
+                    .setFirstResult(10)
+                    .setMaxResults(20)
                     .getResultList();
-            Member findMember = result.get(0);
-            findMember.setName("a");
-
-            // 임베디드 프로젝션
-            em.createQuery("select o.Address from Order o", Address.class)
-                    .getResultList();
-            // 스칼라 프로젝션
-            em.createQuery("select distinct m.username, m.age from Member m", Member.class)
-                    .getResultList();
-
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
