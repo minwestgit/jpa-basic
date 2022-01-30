@@ -16,9 +16,16 @@ public class Member extends BaseEntity{
     @Column(name = "USERNAME")
     private String name;
 
-    @ManyToOne // Member가 Many, Team이 One
+    private int age;
+
+    @ManyToOne(fetch = FetchType.LAZY)// Member가 Many, Team이 One
     @JoinColumn(name = "TEAM_ID")
     private Team team;
+
+    public void changeTeam(Team team) {
+        this.team = team;
+        team.getMembers().add(this);
+    }
 
     @OneToMany(mappedBy = "member") // Order의 member가 주인
     private List<Order> orders = new ArrayList<>();
@@ -120,5 +127,13 @@ public class Member extends BaseEntity{
 
     public void setAddressHistory(List<AddressEntity> addressHistory) {
         this.addressHistory = addressHistory;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 }

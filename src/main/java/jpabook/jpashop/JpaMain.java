@@ -19,12 +19,26 @@ public class JpaMain {
         tx.begin();
 
         try {
-            //페이징 쿼리
-            String jpql = "select m from Member m order by m.name desc";
-            List<Member> resultList = em.createQuery(jpql, Member.class)
-                    .setFirstResult(10)
-                    .setMaxResults(20)
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setName("member1");
+            member.setAge(10);
+
+            member.setTeam(team);
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+            String query = "select m from Member m inner join m.team t"; // 내부 조인
+            String query2 = "select m from Member m left join m.team t"; // 외부 조인
+            String query3 = "select m from Member m, Team t where m.username = t.name"; // 세타 조인
+            List<Member> result = em.createQuery(query, Member.class)
                     .getResultList();
+
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
