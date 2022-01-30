@@ -19,41 +19,18 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 값 타입 저장
-            Member member = new Member();
-            member.setName("member1");
-            member.setHomeAddress(new Address("homeCity", "street", "10000"));
+            // 엔티티 프로젝션
+            List<Member> result = em.createQuery("select m from Member m", Member.class)
+                    .getResultList();
+            Member findMember = result.get(0);
+            findMember.setName("a");
 
-            member.getFavoriteFoods().add("치킨");
-            member.getFavoriteFoods().add("피자");
-            member.getFavoriteFoods().add("떡볶이");
-
-            member.getAddressHistory().add(new Address("old1", "street", "10000"));
-            member.getAddressHistory().add(new Address("old2", "street", "10000"));
-
-            em.persist(member);
-
-            em.flush();
-            em.clear();
-
-            // 값 타입 조회
-            Member findMember = em.find(Member.class, member.getId());
-
-            List<Address> addressHistory = findMember.getAddressHistory(); // 이 때 컬렉션 가져옴
-            Set<String> favoriteFoods = findMember.getFavoriteFoods();
-
-            //findMember.getHomeAddress().setCity("newCity"); // X
-            Address a = findMember.getHomeAddress();
-            findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode()));
-
-            // 치킨 -> 한식
-            findMember.getFavoriteFoods().remove("치킨");
-            findMember.getFavoriteFoods().add("한식");
-
-            //findMember.getAddressHistory().remove(new Address("old1", "street", "10000"));
-            //findMember.getAddressHistory().add(new Address("newCity1", "street", "10000"));
-            findMember.getAddressHistory().add(new AddressEntity("old1", "street", "10000"));
-            findMember.getAddressHistory().add(new AddressEntity("old2", "street", "10000"));
+            // 임베디드 프로젝션
+            em.createQuery("select o.Address from Order o", Address.class)
+                    .getResultList();
+            // 스칼라 프로젝션
+            em.createQuery("select distinct m.username, m.age from Member m", Member.class)
+                    .getResultList();
 
             tx.commit();
         } catch(Exception e) {
