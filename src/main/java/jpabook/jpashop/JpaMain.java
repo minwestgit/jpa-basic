@@ -19,24 +19,19 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            String query = "select m.username, 'HELLO', TRUE From Member m";
+            String query2 = "select m.username, 'HELLO', TRUE From Member m"
+                    + "where m.type = jpql.MemberType.ADMIN";
+            List<Object[]> result = em.createQuery(query).getResultList();
 
-            Member member = new Member();
-            member.setName("member1");
-            member.setAge(10);
+            Book book = new Book();
+            book.setName("JPA");
+            book.setAuthor("author");
 
-            member.setTeam(team);
+            em.persist(book);
 
-            em.persist(member);
-
-            em.flush();
-            em.clear();
-            String query = "select m from Member m inner join m.team t"; // 내부 조인
-            String query2 = "select m from Member m left join m.team t"; // 외부 조인
-            String query3 = "select m from Member m, Team t where m.username = t.name"; // 세타 조인
-            List<Member> result = em.createQuery(query, Member.class)
+            // ITEM과 BOOK은 상속관계이므로 type(i)가 Book으로 나오게 됨.
+            em.createQuery("select i from Item i where type(i) = Book", Item.class)
                     .getResultList();
 
             tx.commit();
