@@ -19,20 +19,20 @@ public class JpaMain {
         tx.begin();
 
         try {
-            String query = "select m.username, 'HELLO', TRUE From Member m";
-            String query2 = "select m.username, 'HELLO', TRUE From Member m"
-                    + "where m.type = jpql.MemberType.ADMIN";
-            List<Object[]> result = em.createQuery(query).getResultList();
+            Member member1 = new Member();
+            member1.setName("관리자1");
+            em.persist(member1);
 
-            Book book = new Book();
-            book.setName("JPA");
-            book.setAuthor("author");
+            Member member2 = new Member();
+            member2.setName("관리자2");
+            em.persist(member2);
 
-            em.persist(book);
+            String query = "select function('group_concat', m.name) from Member m";
 
-            // ITEM과 BOOK은 상속관계이므로 type(i)가 Book으로 나오게 됨.
-            em.createQuery("select i from Item i where type(i) = Book", Item.class)
+            List<String> result = em.createQuery(query, String.class)
                     .getResultList();
+
+            for(String s : result) System.out.println(s); // 관리자1,관리자2
 
             tx.commit();
         } catch(Exception e) {
