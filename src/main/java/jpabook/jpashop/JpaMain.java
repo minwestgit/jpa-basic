@@ -19,20 +19,60 @@ public class JpaMain {
         tx.begin();
 
         try {
+            Team teamA = new Team();
+            teamA.setName("teamA");
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+
             Member member1 = new Member();
-            member1.setName("관리자1");
+            member1.setName("회원1");
+            member1.setTeam(teamA);
             em.persist(member1);
 
             Member member2 = new Member();
-            member2.setName("관리자2");
+            member2.setName("회원2");
+            member2.setTeam(teamA);
             em.persist(member2);
 
-            String query = "select function('group_concat', m.name) from Member m";
+            Member member3 = new Member();
+            member3.setName("회원3");
+            member3.setTeam(teamB);
+            em.persist(member3);
 
-            List<String> result = em.createQuery(query, String.class)
+            // 일반 조인
+            String query = "select m from Member m";
+            List<Member> result = em.createQuery(query, Member.class)
                     .getResultList();
+            for (Member member : result) {
+                // 회원1, 팀A -> SQL
+                // 회원2, 팀A -> 1차캐시
+                // 회원3, 팀B -> SQL
+                // => N+1 문제 발생 가능성
+                System.out.println("member = " + member.getName() + ", " + member.getTeam());
+            }
 
-            for(String s : result) System.out.println(s); // 관리자1,관리자2
+            // 엔티티 페치 조인
+            String jpql = "select t from Team t join fetch t.members where t.name = '팀A'";
+            List<Team> teams = em.createQuery(jpql, Team.class).getResultList();
+            for(Team team : teams) {
+                System.out.println("teamname = " + team.getName() + ", team = " + team);
+                for (Member member : team.getMembers()) {
+                    //페치 조인으로 팀과 회원을 함께 조회해서 지연 로딩 발생 안함
+                    System.out.println("-> username = " + member.getName()+ ", member = " + member);
+                }
+            }
+
+            // 컬렉션 페치 조인
+            String jpql2 = "select t from Team t join fetch t.members where t.name = '팀A'";
+            List<Team> teams2 = em.createQuery(jpql2, Team.class).getResultList();
+            for(Team team : teams2) {
+                System.out.println("teamname = " + team.getName() + ", team = " + team);
+                for (Member member : team.getMembers()) {
+                    //페치 조인으로 팀과 회원을 함께 조회해서 지연 로딩 발생 안함
+                    System.out.println("-> username = " + member.getName()+ ", member = " + member);
+                }
+            }
 
             tx.commit();
         } catch(Exception e) {
