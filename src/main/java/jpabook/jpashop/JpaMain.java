@@ -40,39 +40,19 @@ public class JpaMain {
             member3.setTeam(teamB);
             em.persist(member3);
 
-            // 일반 조인
-            String query = "select m from Member m";
-            List<Member> result = em.createQuery(query, Member.class)
+            // 엔티티 직접 사용
+            // 기본 키 값
+            String jpql = "select m from Member m where m = :member";
+            List resultList = em.createQuery(jpql)
+                    .setParameter("member", member1)
                     .getResultList();
-            for (Member member : result) {
-                // 회원1, 팀A -> SQL
-                // 회원2, 팀A -> 1차캐시
-                // 회원3, 팀B -> SQL
-                // => N+1 문제 발생 가능성
-                System.out.println("member = " + member.getName() + ", " + member.getTeam());
-            }
 
-            // 엔티티 페치 조인
-            String jpql = "select t from Team t join fetch t.members where t.name = '팀A'";
-            List<Team> teams = em.createQuery(jpql, Team.class).getResultList();
-            for(Team team : teams) {
-                System.out.println("teamname = " + team.getName() + ", team = " + team);
-                for (Member member : team.getMembers()) {
-                    //페치 조인으로 팀과 회원을 함께 조회해서 지연 로딩 발생 안함
-                    System.out.println("-> username = " + member.getName()+ ", member = " + member);
-                }
-            }
-
-            // 컬렉션 페치 조인
-            String jpql2 = "select t from Team t join fetch t.members where t.name = '팀A'";
-            List<Team> teams2 = em.createQuery(jpql2, Team.class).getResultList();
-            for(Team team : teams2) {
-                System.out.println("teamname = " + team.getName() + ", team = " + team);
-                for (Member member : team.getMembers()) {
-                    //페치 조인으로 팀과 회원을 함께 조회해서 지연 로딩 발생 안함
-                    System.out.println("-> username = " + member.getName()+ ", member = " + member);
-                }
-            }
+            // 외래 키 값
+            Team team = em.find(Team.class, 1L);
+            String qlString = "select m from Member m where m.team = :team";
+            List resultList2 = em.createQuery(qlString)
+                    .setParameter("team", team)
+                    .getResultList();
 
             tx.commit();
         } catch(Exception e) {
