@@ -40,19 +40,20 @@ public class JpaMain {
             member3.setTeam(teamB);
             em.persist(member3);
 
-            // 엔티티 직접 사용
-            // 기본 키 값
-            String jpql = "select m from Member m where m = :member";
-            List resultList = em.createQuery(jpql)
-                    .setParameter("member", member1)
+            // Named 쿼리
+            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+                    .setParameter("username", "회원1")
                     .getResultList();
 
-            // 외래 키 값
-            Team team = em.find(Team.class, 1L);
-            String qlString = "select m from Member m where m.team = :team";
-            List resultList2 = em.createQuery(qlString)
-                    .setParameter("team", team)
-                    .getResultList();
+            for (Member member : resultList) {
+                System.out.println("member: " + member);
+            }
+
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                            .executeUpdate();
+            em.clear();
+            Member findMember = em.find(Member.class, member1.getId());
+            System.out.println("findMember: " + findMember.getAge()); // clear해줘야 20으로 가져옴.
 
             tx.commit();
         } catch(Exception e) {
